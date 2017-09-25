@@ -5,11 +5,13 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
+var MongoClient = require('mongodb').MongoClient;
+var dbUrl ="mongodb://mwa:mwa@ds147884.mlab.com:47884/mwa";
+
+var persons = require('./routes/persons');
 
 var app = express();
-
+var router = express.Router();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -22,8 +24,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
+//midleware to connect database
+/*app.use((req, res, next)=>{
+	
+})*/
+
+app.use('/api', persons);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -43,7 +49,13 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+//Reuse database connections in routes (or other app) files
+MongoClient.connect(dbUrl,(err,db)=>{
+	if(err) throw err;    
+	app.locals.db = db;
+    app.listen(3000, function() {
+      console.log('Listening on port 3000');
+    });    
+});
 
-app.listen(3000);
-console.log("Server has started on port 3000");
+module.exports = app;
