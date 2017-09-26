@@ -9,12 +9,17 @@ var jwks = require('jwks-rsa');
 var cors = require('cors');
 
 var MongoClient = require('mongodb').MongoClient;
-var dbUrl ="mongodb://mwa:mwa@ds147884.mlab.com:47884/mwa";
+var dbUrl ="mongodb://sacc:sacc@ds149874.mlab.com:49874/sacc";
 
 var persons = require('./routes/persons');
+var locations = require('./routes/locations');
+var emails = require('./routes/emails');
+var phones = require('./routes/phones');
 
 var app = express();
 var router = express.Router();
+app.use(cors());
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -29,20 +34,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Enabling CORS
 app.use(function (req, res, next) {
-    //res.header('Access-Control-Allow-Origin', '*');
-    //res.header('Access-Control-Allow-Headers','Origin, X-Requested-With, Content-Type, Accept');
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    // Request headers you wish to allow
-     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    // Pass to next layer of middleware
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     next();
 });
+
 
 //JWT 
 var jwtCheck = jwt({
@@ -58,12 +56,11 @@ var jwtCheck = jwt({
 });
 app.use(jwtCheck);
 
-//midleware to connect database
-/*app.use((req, res, next)=>{
-	
-})*/
-
 app.use('/api', persons);
+app.use('/api', locations);
+app.use('/api', emails);
+app.use('/api', phones);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
