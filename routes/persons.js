@@ -46,7 +46,7 @@ router.get('/person/:id', function (req, res) {
 	  }); 
 });
 
-//PUT Update a bear with new info.
+//PUT Update a person with new info.
 router.put('/person/:id', function (req, res) {
 	let db = req.app.locals.db;
 	var query= {"_id": ObjectId(req.params.id)};
